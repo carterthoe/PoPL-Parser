@@ -1,41 +1,59 @@
 grammar Python3;
 
-// Parser Rules
+// -------Parser Rules---------
 program: statement* EOF;
 
+// Each statement (line + newlines)
 statement: assignment NEWLINE*;
 
+// Possible assignments
 assignment: ID '=' expression
     | ID '=' array
     | ID assignmentOperator expression;
 
-expression: expression operator expression
-    | value;
+// Expressions used in assignment
+expression: value
+    | '-' expression // handle negative expressions
+    | expression operator expression; // handle multiple expressions
 
-operator: '+'
-    | '-'
-    | '*'
+// Operators used in assignment (PEMDAS)
+operator: '*'
     | '/'
-    | '%';
+    | '%'
+    | '+'
+    | '-';
 
-assignmentOperator: '+='
-    | '-='
-    | '*='
-    | '/=';
+// Assignment operators (PEMDAS)
+assignmentOperator: '*='
+    | '/='
+    | '%='
+    | '+='
+    | '-=';
 
+// Values
 value: BOOL
     | FLOAT
     | INT
     | STRING
     | ID;
 
+// Array
 array: '[' expression (',' expression)* ']';
 
-// Lexer Rules
+
+
+// -------Lexer Rules---------
 BOOL: 'True' | 'False';
+
 FLOAT: [0-9]+'.'[0-9]+;
+
 INT: [0-9]+;
-STRING: '"' (~["\r\n])* '"' | '\'' (~['\r\n])* '\'';
+
+STRING: '"' (~["\n])* '"'
+    | '\'' (~['\n])* '\'';
+    
 ID: [a-zA-Z_][a-zA-Z0-9_]*;
+
 NEWLINE: '\n';
+
 WS: [ \t]+ -> skip;
