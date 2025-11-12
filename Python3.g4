@@ -1,10 +1,10 @@
 grammar Python3;
 
 // -------Parser Rules---------
-program: statement* EOF;
+program: (statement NEWLINE+)* statement? EOF; // each statement must end with a new line except the last one
 
-// Each statement (line + newlines)
-statement: assignment NEWLINE*;
+// Each statement (line)
+statement: assignment;
 
 // Possible assignments
 assignment: ID '=' expression
@@ -13,8 +13,8 @@ assignment: ID '=' expression
 
 // Expressions used in assignment
 expression: value
-    | '-' expression // handle negative expressions
-    | expression operator expression; // handle multiple expressions
+    | '-' expression // Handle negative expressions
+    | expression operator expression; // Handle multiple expressions
 
 // Operators used in assignment (PEMDAS)
 operator: '*'
