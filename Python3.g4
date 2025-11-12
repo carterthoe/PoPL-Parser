@@ -1,19 +1,21 @@
 grammar Python3;
 
+// Parser Rules
 program: statement* EOF;
 
-// Parser
-statement: assignment NEWLINE*;
+statement: assignment NEWLINE;
 
-assignment: ID '=' value
+assignment: ID '=' expression
     | ID '=' array
-    | ID '=' value operator value
-    | ID assignmentOperator value;
-    
+    | ID assignmentOperator expression;
+
+expression: expression operator expression
+    | value;
+
 operator: '+'
     | '-'
     | '*'
-    | '-'
+    | '/'
     | '%';
 
 assignmentOperator: '+='
@@ -26,14 +28,14 @@ value: BOOL
     | INT
     | STRING
     | ID;
-    
-array: '['value(','value)*']';
 
-// Lexer
+array: '[' expression (',' expression)* ']';
+
+// Lexer Rules
 BOOL: 'True' | 'False';
 FLOAT: [0-9]+'.'[0-9]+;
 INT: [0-9]+;
-STRING: '"' [a-zA-Z0-9]* '"' | '\'' [a-zA-Z0-9]* '\'';
+STRING: '"' (~["\r\n])* '"' | '\'' (~['\r\n])* '\'';
 ID: [a-zA-Z_][a-zA-Z0-9_]*;
-NEWLINE: '\r'? '\n';
-WS: [\t]+ -> skip;
+NEWLINE: '\n';
+WS: [ \t]+ -> skip;
