@@ -3,7 +3,7 @@ grammar Python3;
 // Parser Rules
 program: statement* EOF;
 
-statement: assignment NEWLINE;
+statement: assignment NEWLINE*;
 
 assignment: ID '=' expression
     | ID '=' array
