@@ -2,11 +2,26 @@ grammar Python3;
 
 // -------Parser Rules---------
 
-program: NEWLINE* (statement NEWLINE+)* statement? EOF; // each statement must end with a new line except the last one
+program
+    : (NEWLINE | statement NEWLINE)* statement? NEWLINE* EOF
+    ; // each statement must end with a new line except the last one
 
 // Each statement (line)
 statement: assignment
-    | ifStatement;
+    | ifStatement
+    | whileStatement
+    | forStatement;
+    
+//for statements
+forStatement:
+    'for' ID 'in' expression ':'
+    (NEWLINE+ TAB statement NEWLINE*)+;
+    
+//while statements
+whileStatement:
+    'while' (condition| BOOL) ':'
+    (NEWLINE+ TAB statement NEWLINE*)+ ;
+    
     
 //if statements
 ifStatement:
@@ -24,7 +39,7 @@ elifStatement:
 //else statement
 elseStatement:
     'else' ':' 
-    (NEWLINE+ TAB statement NEWLINE*)+;
+    (NEWLINE+ TAB+ statement NEWLINE*)+;
     
 condition:
     orTest;
@@ -95,6 +110,9 @@ array: '[' (expression (',' expression)*)? ']';
 
 
 // -------Lexer Rules---------
+COMMENT: '#' ~[\r\n]* -> skip;
+MULTI_COMMENT: '\'\'\'' ( . | '\r' | '\n' )*? '\'\'\'' -> skip;   // ''' ... ''' ;
+
 BOOL: 'True' | 'False';
 AND: 'and';
 OR: 'or';
