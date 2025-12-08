@@ -18,7 +18,7 @@ This parser performs syntax analysis only and does not execute code or perform s
 
 - Carter Thoe
 - Davin Williams
-- Zack Beyer (zkbgqd)
+- Zack Beyer
 
 ---
 
