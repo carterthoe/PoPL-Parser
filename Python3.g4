@@ -2,29 +2,50 @@ grammar Python3;
 
 // -------Parser Rules---------
 
-program: NEWLINE* (statement NEWLINE+)* statement? EOF; // each statement must end with a new line except the last one
+program
+    : (NEWLINE | statement NEWLINE)* statement? NEWLINE* EOF
+    ; // each statement must end with a new line except the last one
 
 // Each statement (line)
 statement: assignment
-    | ifStatement;
+    | ifStatement
+    | whileStatement
+    | forStatement;
+    
+//reusable indented block
+suite
+    : (NEWLINE+ TAB+ statement NEWLINE*)+
+    ;
+    
+//for statements
+forStatement:
+    FOR ID IN expression ':' suite
+    ;
+    
+//while statements
+whileStatement:
+    WHILE condition ':' suite
+    ;
+    
     
 //if statements
 ifStatement:
-    'if' condition ':'
-    (NEWLINE+ TAB statement NEWLINE*)+ 
+    IF condition ':' suite 
     elifStatement* 
-    elseStatement? ;
+    elseStatement?
+    ;
     
 //else if statements
-elifStatement:
-    'elif' condition ':'
-    (NEWLINE+ TAB statement NEWLINE*)+ ;
+elifStatement
+    : NEWLINE* TAB* ELIF condition ':' suite
+    ;
     
 
 //else statement
-elseStatement:
-    'else' ':' 
-    (NEWLINE+ TAB statement NEWLINE*)+;
+elseStatement
+    : NEWLINE* TAB* ELSE ':' suite
+    ;
+    
     
 condition:
     orTest;
@@ -63,8 +84,16 @@ expression: addexpr
 addexpr: mulexpr (asoperator mulexpr)*; //AS is grouped second
 mulexpr: unary (mdoperator unary)*; //MD is grouped first
 unary: '-' unary | first ; //handles negatives
-first: value
-    | '(' expression ')'; //handles parenthesis
+
+functionCall
+    : (ID | RANGE) '(' (expression (',' expression)*)? ')'
+    ;
+
+first
+    : functionCall
+    | value
+    | '(' expression ')'
+    ; //handles parenthesis
 
 // Operators used in assignment (PEMDAS)
 
@@ -95,6 +124,9 @@ array: '[' (expression (',' expression)*)? ']';
 
 
 // -------Lexer Rules---------
+COMMENT: '#' ~[\r\n]* -> skip;
+MULTI_COMMENT: '\'\'\'' ( . | '\r' | '\n' )*? '\'\'\'' -> skip;   // ''' ... ''' ;
+
 BOOL: 'True' | 'False';
 AND: 'and';
 OR: 'or';
@@ -106,6 +138,14 @@ INT: [0-9]+;
 
 STRING: '"' (~["\n])* '"'
     | '\'' (~['\n])* '\'';
+
+IF: 'if';
+ELIF: 'elif';
+ELSE: 'else';
+WHILE: 'while';
+FOR: 'for';
+IN: 'in';
+RANGE: 'range';
     
 ID: [a-zA-Z_][a-zA-Z0-9_]*;
 
