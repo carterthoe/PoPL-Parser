@@ -85,6 +85,7 @@ addexpr: mulexpr (asoperator mulexpr)*; //AS is grouped second
 mulexpr: unary (mdoperator unary)*; //MD is grouped first
 unary: '-' unary | first ; //handles negatives
 
+//allows an identifier or the RANGE keyword to be followed by parantheses and optional comma sperated args
 functionCall
     : (ID | RANGE) '(' (expression (',' expression)*)? ')'
     ;
